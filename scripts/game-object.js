@@ -22,7 +22,7 @@ class GameObject {
     }
 
     isCollided(gameObjPos, gameObjSize) {
-        return (gameObjSize.y + this.size.x) > (this.pos.dist(gameObjPos));
+        return ((gameObjSize.y + this.size.x) / 2) > (this.pos.dist(gameObjPos));
     }
 
 
