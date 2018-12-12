@@ -2,13 +2,7 @@ class GameManager {
     
     constructor() {
         this.assetManager = new AssetManager();
-        this.bullets = [];
-        this.enemies = [];
-        this.stars = [];
-        this.particleSystems = [];
-        this.enemyGenerateSpeed = 200;
-        this.enemySpeed = 2;
-        this.score = 0;
+        
     }
 
     preload() {
@@ -16,6 +10,15 @@ class GameManager {
     }
 
     init() {
+
+        this.bullets = [];
+        this.enemies = [];
+        this.stars = [];
+        this.particleSystems = [];
+        this.enemyGenerateSpeed = 200;
+        this.enemySpeed = 2;
+        this.score = 0;
+
         this.player = new Player(
             createVector(width / 2, height - 100),
             createVector(),
@@ -40,9 +43,14 @@ class GameManager {
         this.player.pos.x = constrain(mouseX, this.player.size.x / 2, width - (this.player.size.x / 2));        
         this.player.update();
         this.player.show();
-        let bullet = this.player.fireBullet(this.assetManager.bulletImg);
+
+        const bullet = this.player.fireBullet(this.assetManager.bulletImg);
         if(bullet) {
             this.bullets.push(bullet);
+        }
+
+        if (this.enemies.reduce((acc, e) => acc || e.isCollided(this.player.pos, this.player.size),false)) {
+            this.init();
         }
     }
 
@@ -54,11 +62,15 @@ class GameManager {
 
         this.bullets = this.bullets.filter(b => {
            let isCollided = false;
+
             this.enemies = this.enemies.map(e => {
+
                 if (!isCollided && b.isCollided(e.pos, e.size)) {
+
                     e.life -= this.player.damage;
                     this.particleSystems.push(new ParticleSystem(b.pos.copy(), 10));
                     isCollided = true;
+
                 }
                 return e;
             });
@@ -71,7 +83,8 @@ class GameManager {
         if(frameCount % this.enemyGenerateSpeed === 0) {
             const enemyCount = random(2, 6);
             let posX = [0,1,2,3,4,5];
-            Array.from(Array(parseInt(enemyCount)).keys()).forEach(a => {
+
+            [...Array(parseInt(enemyCount)).keys()].forEach(a => {
                 let xIndex = posX.splice(parseInt(random(0, posX.length - 1)), 1)[0];
                
                 this.enemies.push(new GameObject(
@@ -94,7 +107,6 @@ class GameManager {
         fill(255);
         textSize(30);
         text(`: ${this.score}`,40,28);
-        
         pop();
     }
 
